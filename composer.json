@@ -1,0 +1,21 @@
+{
+    "name": "wycto/login",
+    "description": "一个php第三方登录类库",
+    "type": "library",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "weiyi",
+            "email": "294287600@qq.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "wycto\\login\\": "src"
+        }
+    }
+}
