@@ -9,7 +9,6 @@
             "email": "294287600@qq.com"
         }
     ],
-    "minimum-stability": "dev",
     "require": {
         "php": ">=5.4.0"
     },
