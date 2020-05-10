@@ -30,4 +30,4 @@ $name = 'qq',$config = array()
 $login = \login\Login::getApp($name,$config);
 $login->getUserInfo();
 ~~~
-  就是这么简单
+
