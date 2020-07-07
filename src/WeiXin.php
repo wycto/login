@@ -44,7 +44,8 @@ class WeiXin extends LoginAbstract
     function login($callback=null){
 
         $state  = md5(uniqid(rand(), TRUE));
-        Helper_session::set('wx_state', $state); //存到SESSION
+        //Helper_session::set('wx_state', $state); //存到SESSION
+        $_SESSION['wx_state'] = $state;//存到SESSION
 
         if($callback!=null){
             $callback = $this->getCallback($callback);
@@ -71,7 +72,8 @@ class WeiXin extends LoginAbstract
         $callback = urlEncode($callback);
 
         $state = md5(uniqid(rand(), TRUE));
-        Helper_session::set('wap_wx_status', $state);
+        //Helper_session::set('wap_wx_status', $state);
+        $_SESSION['wap_wx_status'] = $state;
         $url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' . $AppID . '&redirect_uri=' . $callback . '&response_type=code&scope=snsapi_userinfo&state=' . $state . '#wechat_redirect';
         header("Location: $url");
     }
@@ -82,12 +84,14 @@ class WeiXin extends LoginAbstract
      * @see LoginAbstract::auth()
      */
     function auth(){
-        if($_GET['state']!=Helper_session::get('wx_state')&&$_GET['state'] != Helper_session::get('wap_wx_status')){
+        if($_GET['state']!=$_SESSION['wx_state']&&$_GET['state'] != $_SESSION['wap_wx_status']){
             return $this->_redirectMessage('登录失败', '登录超时！请稍后重试，错误代码5001', url("user/login"), 'fail', 3);
             exit;
         }else{
-            Helper_session::set('wx_state', null);
-            Helper_session::set('wap_wx_status', null);
+            //Helper_session::set('wx_state', null);
+            //Helper_session::set('wap_wx_status', null);
+            $_SESSION['wx_state'] = null;
+            $_SESSION['wap_wx_status'] = null;
         }
 
         if($this->_config['terminal']=="pc"){
