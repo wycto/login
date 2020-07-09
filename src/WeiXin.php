@@ -85,7 +85,8 @@ class WeiXin extends LoginAbstract
      */
     function auth(){
         if($_GET['state']!=$_SESSION['wx_state']&&$_GET['state'] != $_SESSION['wap_wx_status']){
-            return $this->_redirectMessage('登录失败', '登录超时！请稍后重试，错误代码5001', url("user/login"), 'fail', 3);
+            //return $this->_redirectMessage('登录失败', '登录超时！请稍后重试，错误代码5001', url("user/login"), 'fail', 3);
+            return array('errcode'=>'5001','errmsg'=>'已经超时，请稍后重试，错误代码5001');
             exit;
         }else{
             //Helper_session::set('wx_state', null);
