@@ -35,16 +35,14 @@ $login->getUserInfo();
 ~~~
 $name = 'qq';
 $config = array(
-  // 开发平台获取
-  'app_id' => '101363004',
-  // 开发平台获取
-  'app_key' => '5023acb1767d931a664e995b89e5de07',
-  // 回掉地址，需要在腾讯开发平台填写,带域名
-  'callback' => "/index/user/qqcallback",
-  'scope' => 'get_user_info',//不用改
-  'expires_in' => 7775000,//过期时间，不用改
-  'display' => '',/*仅PC网站接入时使用。 用于展示的样式。不传则默认展示为PC下的样式。如果传入“mobile”，则展示为mobile端下的样式。*/
-  'g_ut' => ''/*仅WAP网站接入时使用。QQ登录页面版本（1：wml版本； 2：xhtml版本），默认值为1。*/
+    //开发平台获取
+    'app_id' => '101389004',
+    //开发平台获取
+    'app_key' => '5023acb17c76531a664e995b89e5de07',
+    //回掉地址，需要在腾讯开发平台填写
+    'callback' => "/index/user/qqcallback",
+    'scope' => 'get_user_info',
+    'expires_in' => 7775000
 );
 
 /**
@@ -54,7 +52,7 @@ function qqLoginAction()
 {
     // qq登录
     $this->_set_referer();
-    $login = login();
+    $login = \login\Login::getApp($name,$config);
     $login->login();
 }
 
@@ -63,9 +61,10 @@ function qqLoginAction()
  */
 function qqCallbackAction()
 {
-    $login = login();
+    $login = \login\Login::getApp($name,$config);
     // 获取用户信息
     $userinfo = $login->getUserInfo();
+
     if (! isset($userinfo['openid']) || empty($userinfo['openid'])) {
         return $this->redirect(url("index/index/index"));
     }
@@ -84,3 +83,31 @@ function qqCallbackAction()
 }
 ~~~
 
+### 微信登录示例：
+~~~
+$name = 'weixin';
+$config = array(
+    //开发平台获取
+    'app_id' => 'wx587351c59b2fbca4',
+    //开发平台获取
+    'app_secret' => '382b75b03fa71c5691555c65037598dc',
+    //回掉地址，需要在腾讯开发平台填写
+    'callback' => "/default/user/wxcallback",
+    //终端类型
+    'terminal' => "pc",//pc为电脑端扫码登录，否则微信公众号登录
+    //手机端回调地址
+    'callback_wx' => "/wap/user/wxcallback",
+    //订阅号appid
+    'app_id_d' => 'wxae475941e485a3a8',
+    //订阅号app_secret
+    'app_secret_d' => '3ca2f30daa500012a51b0d126e83eefe'
+);
+
+//登录
+$login = \login\Login::getApp($name,$config);
+$login->login();
+
+//回调获取信息
+$login = \login\Login::getApp($name,$config);
+$userinfo = $login->getUserInfo();
+~~~
