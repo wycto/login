@@ -31,6 +31,11 @@ $login = \login\Login::getApp($name,$config);
 $login->getUserInfo();
 ~~~
 
+### 配置强调
+~~~
+$config['framework'] = 'tp';//framework为空使用原生$_SESSION, tp使用thinkphp的session助手函数
+~~~
+
 ### QQ登录示例：
 ~~~
 $name = 'qq';

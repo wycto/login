@@ -23,7 +23,7 @@ class WeiXin extends LoginAbstract
         'app_id_d' => 'wxae47b941e485a3a8',
         //订阅号app_secret
         'app_secret_d' => '3ca2f30daa500012ac1b0d126e83eefe',
-
+        'framework' => ''//框架，如tp
     );
 
     // 全局唯一实例
@@ -45,7 +45,12 @@ class WeiXin extends LoginAbstract
 
         $state  = md5(uniqid(rand(), TRUE));
         //Helper_session::set('wx_state', $state); //存到SESSION
-        $_SESSION['wx_state'] = $state;//存到SESSION
+        if($this->_config['framework']=='tp'){
+            session('wx_state', $state);
+        }else{
+            $_SESSION['wx_state'] = $state;//存到SESSION
+        }
+
 
         if($callback!=null){
             $callback = $this->getCallback($callback);
@@ -73,7 +78,12 @@ class WeiXin extends LoginAbstract
 
         $state = md5(uniqid(rand(), TRUE));
         //Helper_session::set('wap_wx_status', $state);
-        $_SESSION['wap_wx_status'] = $state;
+        if($this->_config['framework']=='tp'){
+            session('wap_wx_status', $state);
+        }else{
+            $_SESSION['wap_wx_status'] = $state;//存到SESSION
+        }
+
         $url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' . $AppID . '&redirect_uri=' . $callback . '&response_type=code&scope=snsapi_userinfo&state=' . $state . '#wechat_redirect';
         header("Location: $url");
     }
@@ -84,15 +94,28 @@ class WeiXin extends LoginAbstract
      * @see LoginAbstract::auth()
      */
     function auth(){
-        if($_GET['state']!=$_SESSION['wx_state']&&$_GET['state'] != $_SESSION['wap_wx_status']){
+        if($this->_config['framework']=='tp'){
+            $wx_state = session('wx_state');
+            $wap_wx_status = session('wap_wx_status');
+        }else{
+            $wx_state = $_SESSION['wx_state'];
+            $wap_wx_status = $_SESSION['wap_wx_status'];
+        }
+
+        if($_GET['state']!=$wx_state&&$_GET['state']!=$wap_wx_status){
             //return $this->_redirectMessage('登录失败', '登录超时！请稍后重试，错误代码5001', url("user/login"), 'fail', 3);
             return array('errcode'=>'5001','errmsg'=>'已经超时，请稍后重试，错误代码5001');
             exit;
         }else{
             //Helper_session::set('wx_state', null);
             //Helper_session::set('wap_wx_status', null);
-            $_SESSION['wx_state'] = null;
-            $_SESSION['wap_wx_status'] = null;
+            if($this->_config['framework']=='tp'){
+                session('wx_state',null);
+                session('wap_wx_status',null);
+            }else{
+                unset($_SESSION['wx_state']);
+                unset($_SESSION['wap_wx_status']);
+            }
         }
 
         if($this->_config['terminal']=="pc"){

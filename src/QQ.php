@@ -28,7 +28,8 @@ class QQ extends LoginAbstract
         'scope' => 'get_user_info',
         'expires_in' => 7775000,
         'display' => '',/*仅PC网站接入时使用。 用于展示的样式。不传则默认展示为PC下的样式。如果传入“mobile”，则展示为mobile端下的样式。*/
-        'g_ut' => ''/*仅WAP网站接入时使用。QQ登录页面版本（1：wml版本； 2：xhtml版本），默认值为1。*/
+        'g_ut' => '',/*仅WAP网站接入时使用。QQ登录页面版本（1：wml版本； 2：xhtml版本），默认值为1。*/
+        'framework' => ''//框架，如tp
     );
 
     // 全局唯一实例
@@ -65,7 +66,11 @@ class QQ extends LoginAbstract
 
         // -------生成唯一随机串防CSRF攻击
         $state = md5(uniqid(rand(), TRUE));
-        $_SESSION['qquser.state'] = $state;
+        if($this->_config['framework']=='tp'){
+            session('qquser.state', $state);
+        }else{
+            $_SESSION['qquser.state'] = $state;
+        }
 
         // -------构造请求参数列表
         $keysArr = array(
@@ -88,7 +93,12 @@ class QQ extends LoginAbstract
      */
     function getAccessToken(){
         // --------验证state防止CSRF攻击
-        $state = $_SESSION['qquser.state'];
+        if($this->_config['framework']=='tp'){
+            session('qquser.state');
+        }else{
+            $state = $_SESSION['qquser.state'];
+        }
+
         if ($_GET['state'] != $state) {
             return $this->showError('0', "验证过期，请重新操作");
             exit();
@@ -120,7 +130,12 @@ class QQ extends LoginAbstract
 
         $params = array();
         parse_str($response, $params);
-        $_SESSION['qquser.access_token'] = $params["access_token"];
+        if($this->_config['framework']=='tp'){
+            session('qquser.access_token',$params["access_token"]);
+        }else{
+            $_SESSION['qquser.access_token'] = $params["access_token"];
+        }
+
         return $params["access_token"];
     }
 
@@ -131,8 +146,13 @@ class QQ extends LoginAbstract
     function getOpenid()
     {
         // 获取openid
+        if($this->_config['framework']=='tp'){
+            $access_token = session('qquser.access_token');
+        }else{
+            $access_token = $_SESSION['qquser.access_token'];
+        }
         $keysArr = array(
-            "access_token" => $_SESSION['qquser.access_token']
+            "access_token" => $access_token
         );
 
         $graph_url = $this->combineURL(self::GET_OPENID_URL, $keysArr);
@@ -152,32 +172,24 @@ class QQ extends LoginAbstract
             exit();
         }
 
-        $_SESSION['qquser.openid'] = $user['openid'];
-        return $user['openid'];
-    }
+        if($this->_config['framework']=='tp'){
+            session('qquser.openid',$user['openid']);
+        }else{
+            $_SESSION['qquser.openid'] = $user['openid'];
+        }
 
-    /**
-     * 获取用户信息
-     */
-    function getInfo(){
-        // 获取用户信息
-        $keysArr = array(
-            "access_token" => $params["access_token"],
-            "oauth_consumer_key" => $this->_config['app_id'],
-            "openid" => $_SESSION['qquser.openid']
-        );
-        $baseURL = "https://graph.qq.com/user/get_user_info";
-        $url = $this->combineURL($baseURL, $keysArr);
-        $response = $this->get_contents($url);
-        $response = json_decode($response, true);
-        return array_merge($response, $user, $params);
+        return $user['openid'];
     }
 
 /**************************************************************************/
 
     function callback()
     {
-        $state = $_SESSION['qquser.state'];
+        if($this->_config['framework']=='tp'){
+            $state = session('qquser.state');
+        }else{
+            $state = $_SESSION['qquser.state'];
+        }
 
         // --------验证state防止CSRF攻击
         if ($_GET['state'] != $state) {
@@ -224,7 +236,12 @@ class QQ extends LoginAbstract
     {
 
         // --------验证state防止CSRF攻击
-        $state = $_SESSION['qquser.state'];
+        if($this->_config['framework']=='tp'){
+            $state = session('qquser.state');
+        }else{
+            $state = $_SESSION['qquser.state'];
+        }
+
         if ($_GET['state'] != $state) {
             return $this->showError('0', "验证过期，请重新操作");
             exit();
