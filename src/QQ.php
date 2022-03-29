@@ -317,13 +317,13 @@ class QQ extends LoginAbstract
      */
     function getCallback($callback)
     {
-        if (strpos($callback, 'http://') === false) {
-            $this->_config['callback'] = "http://" . $_SERVER['HTTP_HOST'] . $callback;
-        }elseif (strpos($callback, 'https://') === false){
-            $this->_config['callback'] = "https://" . $_SERVER['HTTP_HOST'] . $callback;
+        if (strpos($callback, 'http://') === false && strpos($callback, 'https://') === false) {
+            $http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' :'http://';
+            $this->_config['callback'] = $http_type . $_SERVER['HTTP_HOST'] . $callback;
         }else {
             $this->_config['callback'] = $callback;
         }
+
         return $this->_config['callback'];
     }
 
