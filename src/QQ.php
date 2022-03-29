@@ -319,7 +319,9 @@ class QQ extends LoginAbstract
     {
         if (strpos($callback, 'http://') === false) {
             $this->_config['callback'] = "http://" . $_SERVER['HTTP_HOST'] . $callback;
-        } else {
+        }elseif (strpos($callback, 'https://') === false){
+            $this->_config['callback'] = "https://" . $_SERVER['HTTP_HOST'] . $callback;
+        }else {
             $this->_config['callback'] = $callback;
         }
         return $this->_config['callback'];
