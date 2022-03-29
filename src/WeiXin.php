@@ -167,6 +167,8 @@ class WeiXin extends LoginAbstract
     function getCallback($callback){
         if(strpos($callback,'http://')===false){
             $this->_config['callback'] = "http://" . $_SERVER['HTTP_HOST'] . $callback;
+        }elseif(strpos($callback,'https://')===false){
+            $this->_config['callback'] = "https://" . $_SERVER['HTTP_HOST'] . $callback;
         }else{
             $this->_config['callback'] = $callback;
         }
